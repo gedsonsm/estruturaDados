@@ -1,0 +1,316 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Autoriza Débito em Conta IBK",
+    "description": "\nAPI responsável pela autorização de débito em conta via IBK\n\n## Segurança: Oauth 2.0\n---\n__Para usar a API de autorização de débito em conta IBK ...__\n\n---\n",
+    "termsOfService": "http://mercantildobrasil.com.br",
+    "contact": {
+      "name": "Suporte de API's",
+      "url": "http://mercantildobrasil.com.br",
+      "email": "suporte-apis@mercantil.com.br"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apihml.mercantil.com.br:8443",
+      "description": "Homologacao"
+    }
+  ],
+  "tags": [
+    {
+      "name": "API's",
+      "description": "para consumo canais MB"
+    }
+  ],
+  "paths": {
+    "/v1/debitoIBK": {
+      "post": {
+        "description": "Autoriza débito em conta.",
+        "tags": [
+          "Autoriza débito em conta"
+        ],
+        "requestBody": {
+          "description": "Autoriza débito em conta no Banklink.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutorizacaoDebitoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutorizacaoDebitoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutorizacaoDebitoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutorizacaoDebitoResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutorizacaoDebitoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutorizacaoDebitoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AutorizacaoDebitoRequest": {
+        "type": "object",
+        "description": "Dados para autorização de débito\n",
+        "required": [
+          "TipoTransacao",
+          "IdentificacaoTransacaoCanal",
+          "ContaDebito",
+          "AutorizacaoDebito",
+          "InformacaoComplementarLog"
+        ],
+        "properties": {
+          "TipoTransacao": {
+            "type": "object",
+            "properties": {
+              "codigoTransacao": {
+                "type": "number",
+                "maximum": 99999999,
+                "description": "Código da transação Banklink"
+              },
+              "versaoTransacao": {
+                "type": "number",
+                "maximum": 99999,
+                "description": "Versao da transacao Banklink"
+              },
+              "opcaoInternetBanking": {
+                "type": "number",
+                "maximum": 999,
+                "description": "Código de Opções do Internet Banking"
+              },
+              "subOpcaoInternetBanking": {
+                "type": "number",
+                "maximum": 999,
+                "description": "Sub Código de Opções do Internet Banking"
+              }
+            }
+          },
+          "IdentificacaoTransacaoCanal": {
+            "type": "object",
+            "required": [
+              "codigoCanal",
+              "codigoPontoAtendimento",
+              "identificadorResponsavelDataContabil"
+            ],
+            "properties": {
+              "codigoCanal": {
+                "type": "number",
+                "maximum": 99,
+                "description": "Código do canal"
+              },
+              "codigoPontoAtendimento": {
+                "type": "number",
+                "maximum": 9999,
+                "description": "Código do ponto de atendimento"
+              },
+              "identificadorResponsavelDataContabil": {
+                "type": "number",
+                "maximum": 1,
+                "description": "'Identificador Responsável por gerar a data contábil da transação:'\n* 1 - BKL\n* 2 - Canal\n"
+              },
+              "dataContabilTransacaoCanal": {
+                "type": "string",
+                "format": "date",
+                "description": "Data contábil da transação (YYYYMMDD)"
+              }
+            }
+          },
+          "ContaDebito": {
+            "type": "object",
+            "required": [
+              "numeroAgencia",
+              "numeroConta",
+              "variacaoConta",
+              "tipoConta"
+            ],
+            "properties": {
+              "numeroAgencia": {
+                "type": "number",
+                "maximum": 9999,
+                "description": "Número da agência da conta do cliente"
+              },
+              "numeroConta": {
+                "type": "number",
+                "maximum": 999999999,
+                "description": "Número da conta da conta do cliente"
+              },
+              "variacaoConta": {
+                "type": "number",
+                "maximum": 999,
+                "description": "Variação da conta do cliente"
+              },
+              "tipoConta": {
+                "type": "number",
+                "maximum": 1,
+                "description": "Tipo da conta do cliente\n* 1 - Conta Corrente\n* 2 - Conta Poupança\n* 3 - Conta Benefício INSS\n"
+              }
+            }
+          },
+          "AutorizacaoDebito": {
+            "type": "object",
+            "required": [
+              "valorDebito",
+              "historicoLancamento",
+              "dataPendenciaCanal",
+              "nsuPendenciaCanal"
+            ],
+            "properties": {
+              "valorDebito": {
+                "type": "number",
+                "format": "bigDecimal (13,02)",
+                "description": "Valor do débito"
+              },
+              "historicoLancamento": {
+                "type": "number",
+                "maximum": 9999,
+                "description": "Histórico do lançamento"
+              },
+              "complementoLancamentoExtrato": {
+                "type": "string",
+                "maxLength": 25,
+                "description": "Complemento do lançamento para extrato"
+              },
+              "dataPendenciaCanal": {
+                "type": "string",
+                "format": "date",
+                "description": "Data da pendência no canal YYYYMMDD"
+              },
+              "nsuPendenciaCanal": {
+                "type": "number",
+                "maximum": 999999999,
+                "description": "NSU da pendência no canal"
+              }
+            }
+          },
+          "complementoParteVariavel": {
+            "type": "string",
+            "maxLength": 267,
+            "description": "Complemento parte variável do LOG"
+          }
+        }
+      },
+      "AutorizacaoDebitoResponse": {
+        "type": "object",
+        "description": "Dados de retorno para canal",
+        "required": [
+          "DadosErro",
+          "nsuCanal",
+          "dataNSUCanal",
+          "dataContabilTransacao"
+        ],
+        "properties": {
+          "DadosErro": {
+            "type": "object",
+            "properties": {
+              "codigoErro": {
+                "type": "string",
+                "description": "O codigo do erro  definido no MB, exemplo 'BKLM001E'"
+              },
+              "descricaoErro": {
+                "type": "string",
+                "description": "Descreve o erro, exemplo 'Conta não cadastrada'"
+              },
+              "indicadorErro": {
+                "type": "integer",
+                "description": "'O indicador de erro informa qual o tipo de erro, sendo os possíveis retornos:'\n  * ` 0` - Sucesso\n  * ` 1` - Erro negocial\n  * `-1 `- Erro de infraestrutura\n  \n"
+              }
+            }
+          },
+          "nsuCanal": {
+            "type": "number",
+            "maximum": 999999999,
+            "description": "NSU do canal"
+          },
+          "dataNSUCanal": {
+            "type": "string",
+            "format": "date",
+            "description": "Data do NSU do canal YYYYMMDD"
+          },
+          "dataContabilTransacao": {
+            "type": "string",
+            "format": "date",
+            "description": "Data contábil da transação"
+          },
+          "DadosTarifa": {
+            "type": "object",
+            "required": [
+              "codigoTarifa",
+              "valorTarifa",
+              "historicoLancamentoTarifa"
+            ],
+            "properties": {
+              "codigoTarifa": {
+                "type": "number",
+                "maximum": 9999,
+                "description": "Código da tarifa"
+              },
+              "valorTarifa": {
+                "type": "number",
+                "format": "bigDecimal (13,02)",
+                "description": "Valor da tarifa"
+              },
+              "historicoLancamentoTarifa": {
+                "type": "number",
+                "maximum": 9999,
+                "description": "Código da tarifa"
+              }
+            }
+          },
+          "dadosRecibo": {
+            "type": "string",
+            "maxLength": 350,
+            "description": "Dados do recibo"
+          }
+        }
+      }
+    }
+  }
+}
